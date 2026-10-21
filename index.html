@@ -1,480 +1,1271 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PharmaSupply Procurement, Shipping & Patient Chart</title>
-  <style>
-    :root {
-      --bg-color: #f0f2f5;
-      --card-bg: #ffffff;
-      --accent: #004b87;
-      --error: #b30000;
-      --warning: #b38600;
-      --text: #222222;
-      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg-color);
-      color: var(--text);
-      margin: 0;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .hud {
-      width: 100%;
-      max-width: 900px;
-      background: #1e293b;
-      color: #f8fafc;
-      padding: 16px 24px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .hud h3 { margin: 0; font-size: 16px; font-weight: 600; color: #94a3b8; }
-    .hud .step-badge {
-      background: #0284c7;
-      padding: 4px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-    .container {
-      width: 100%;
-      max-width: 900px;
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      border: 1px solid #e2e8f0;
-      min-height: 480px;
-      position: relative;
-    }
-    .portal-banner {
-      border-bottom: 2px solid #cbd5e1;
-      padding-bottom: 12px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .portal-banner h2 { margin: 0; font-size: 20px; color: #0f172a; }
-    .portal-system-tag { font-family: var(--font-mono); font-size: 12px; color: #64748b; }
-    .form-group {
-      margin-bottom: 18px;
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 6px;
-      color: #334155;
-    }
-    input, select, textarea {
-      padding: 10px 14px;
-      border: 1px solid #94a3b8;
-      border-radius: 4px;
-      font-size: 14px;
-      outline: none;
-    }
-    input:focus, select:focus {
-      border-color: #0284c7;
-      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
-    }
-    .token-box {
-      background: #f8fafc;
-      border: 1px dashed #64748b;
-      padding: 12px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      margin: 16px 0;
-      user-select: all;
-      color: #0f172a;
-    }
-    .btn {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-    .btn:hover { background: #0369a1; }
-    .btn-secondary { background: #64748b; margin-right: 8px; }
-    .btn-secondary:hover { background: #475569; }
-    .error-text {
-      color: var(--error);
-      font-size: 13px;
-      margin-top: 6px;
-      display: none;
-      font-weight: 500;
-    }
-    .scratchpad {
-      margin-top: 24px;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #92400e;
-    }
-    .scratchpad strong { display: block; margin-bottom: 4px; }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Login Workflow Prototype</title>
+    <style>
+      :root {
+        --bg: #eef3f7;
+        --panel: #ffffff;
+        --panel-alt: #f8fafc;
+        --navy: #123d66;
+        --navy-2: #0f3155;
+        --blue: #0b6cbf;
+        --green: #2e7d32;
+        --amber: #c07a00;
+        --red: #b42318;
+        --slate: #475569;
+        --slate-2: #64748b;
+        --line: #dfe7ef;
+        --shadow: 0 10px 24px rgba(15, 49, 85, 0.08);
+      }
 
-  <!-- Top Real-time HUD -->
-  <div class="hud">
-    <div>
-      <h3>PHARMACY ORDER WORKFLOW</h3>
-      <span style="font-size: 13px; color: #cbd5e1;">Ceftriaxone 1g IV Vials [50 pk]</span>
-    </div>
-    <div>
-      <span class="step-badge" id="stepIndicator">Procurement · Sign in</span>
-    </div>
-  </div>
+      * { box-sizing: border-box; }
 
-  <!-- Dynamic Portal Display Area -->
-  <div class="container" id="portalContainer">
-    <!-- Populated by JavaScript -->
-  </div>
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: #18212d;
+        padding: 24px;
+      }
 
-  <!-- Persistent handoff notes across disconnected systems -->
-  <div class="hud" style="background: #ffffff; color: #334155; border: 1px solid #cbd5e1; margin-top: 20px;">
-    <div style="width: 100%;">
-      <label style="color: #64748b;">Cross-system handoff notes</label>
-      <div id="clipboardDisplay" style="font-family: var(--font-mono); font-size: 12px; color: #0284c7; margin-top: 6px;">
-        No order data yet.
-      </div>
-    </div>
-  </div>
+      .topbar {
+        max-width: 980px;
+        margin: 0 auto 18px;
+        background: var(--navy-2);
+        color: #eff6ff;
+        border-radius: 12px;
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow);
+      }
 
-<script>
-  let currentStep = 1;
-  const orderState = {
-  medication: "Ceftriaxone 1g IV Vials",
-  ndc: "NDC-00703-9121-01",
-  quantity: 1,
-  costCenter: "",
-  orderId: "REQ-PR-24198",
-  shippingLabel: "",
-  patientId: "",
-  chartStatus: "",
-  procurementUsername: "",
-  procurementPassword: "",
-  ehrEmail: "",
-  ehrPassword: "",
-  shippingUsername: "",
-  shippingPassword: "",
-  shippingAttempts: 0,
-  shipmentMismatch: false
-};
+      .topbar strong {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #a8c4de;
+      }
 
-const screens = [
-  {
-    title: "RxProcure | Sign in",
-    tag: "CARDINAL PHARMACY PORTAL · AUTHENTICATION",
-    render: () => loginForm({
-      system: "procurement",
-      userLabel: "Username",
-      userPlaceholder: "e.g. mturner",
-      passwordLabel: "Password",
-      message: "Sign in to RxProcure to place the medication order.",
-      userHint: "Use your pharmacy username, not your email."
-    })
-  },
-  {
-    title: "RxProcure | Medication task",
-    tag: "CARDINAL PHARMACY PORTAL · ORDER TASK",
-    render: () => medicationTask()
-    },
-    {
-    title: "RxProcure | Finalize order",
-    tag: "CARDINAL PHARMACY PORTAL · ORDER TASK",
-    render: () => orderTask()
-    },
-    {
-    title: "ChartOne EHR | Sign in",
-    tag: "EXTERNAL EHR · AUTHENTICATION",
-    render: () => loginForm({
-      system: "ehr",
-      userLabel: "Work email",
-      userPlaceholder: "e.g. mturner@carecenter.org",
-      passwordLabel: "Password",
-      message: "This EHR is a separate system and requires a different login from the pharmacy portal.",
-      userHint: "Your work email is required here, not your pharmacy username."
-    })
-  },
-  {
-    title: "ChartOne EHR | Medication entry",
-    tag: "EXTERNAL EHR · MEDICATION RECORD",
-    render: () => chartForm()
-  },
-  {
-    title: "ShipTrack | Sign in",
-    tag: "SHIPPING PORTAL · AUTHENTICATION",
-    render: () => loginForm({
-      system: "shipping",
-      userLabel: "Shipping username",
-      userPlaceholder: "e.g. shipops",
-      passwordLabel: "Password",
-      message: "Use the shipping portal credentials. The pharmacy login will not work here.",
-      userHint: "Hint: the correct shipping username is shipops and the password is Transit#14."
-    })
-  },
-  {
-    title: "ShipTrack | Shipping lookup",
-    tag: "SHIPPING PORTAL · TRACKING",
-    render: () => shippingLookup()
-  },
-  {
-    title: "Workflow complete",
-    tag: "CROSS-SYSTEM HANDOFF · SUMMARY",
-    render: () => finalSummary()
-  }
-];
+      .topbar span {
+        font-size: 15px;
+        font-weight: 700;
+      }
 
-function loginForm({ system, userLabel, userPlaceholder, passwordLabel, message, userHint }) {
-  const userId = `${system}User`;
-  const passwordId = `${system}Password`;
-  return `
-    <p>${message}</p>
-    <div class="form-group">
-      <label for="${userId}">${userLabel}</label>
-      <input type="text" id="${userId}" placeholder="${userPlaceholder}" />
-      <div id="${userId}Error" class="error-text">Enter your ${userLabel.toLowerCase()} to continue.</div>
-    </div>
-    <div class="form-group">
-      <label for="${passwordId}">${passwordLabel}</label>
-      <input type="password" id="${passwordId}" placeholder="Enter your password" />
-      <div id="${passwordId}Error" class="error-text">Enter your password to continue.</div>
-    </div>
-    <div class="scratchpad">
-      <strong>Credential reminder</strong>
-      ${userHint}
-    </div>
-    <button class="btn" onclick="submitLogin('${system}')">Sign in</button>
-  `;
-}
+      .step-pill {
+        background: rgba(11, 108, 191, 0.2);
+        color: #e0f2fe;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
 
-function medicationTask() {
-  return `
-    <p>Select the medication and quantity for the order. This is the most common issue to re-enter in a second system.</p>
-    <div class="form-group">
-      <label for="medication">Medication</label>
-      <select id="medication">
-        <option value="">Select medication</option>
-        <option value="${orderState.ndc}">Ceftriaxone 1g IV Vials [50 pk]</option>
-        <option value="NDC-00093-0101-56">Amoxicillin 500mg</option>
-        <option value="NDC-00456-1200-01">Azithromycin 250mg</option>
-      </select>
-      <div id="medicationError" class="error-text">Select Ceftriaxone 1g IV Vials for this order.</div>
-    </div>
-    <div class="form-group">
-      <label for="quantity">Quantity (case packs of 50)</label>
-      <input type="number" id="quantity" min="1" max="5" value="1" />
-      <div id="quantityError" class="error-text">Enter a quantity from 1 to 5.</div>
-    </div>
-    <button class="btn" onclick="submitMedicationTask()">Save medication selection</button>
-  `;
-}
+      .shell {
+        max-width: 980px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
 
-function orderTask() {
-  return `
-    <p>Enter the billing cost center and submit the order.</p>
-    <div class="form-group">
-      <label for="costCenter">Hospital cost center</label>
-      <input type="text" id="costCenter" placeholder="CC-4018-RX" />
-      <div id="costCenterError" class="error-text">Use the format CC- followed by 4 digits and -RX.</div>
-    </div>
-    <div class="token-box"><strong>Medication:</strong> ${orderState.medication}<br><strong>Quantity:</strong> ${orderState.quantity} case pack(s)</div>
-    <button class="btn" onclick="submitOrderTask()">Submit medication order</button>
-  `;
-}
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 12px;
+        padding: 22px 28px 18px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      }
 
-function chartForm() {
-  return `
-    <p>Re-enter the same medication details into the patient chart to complete the clinical workflow.</p>
-    <div class="form-group">
-      <label for="patientId">Patient record ID</label>
-      <input type="text" id="patientId" placeholder="e.g. PT-2048" />
-      <div id="patientError" class="error-text">Enter the patient record ID to continue.</div>
-    </div>
-    <div class="token-box"><strong>Medication to add:</strong> ${orderState.medication}<br><strong>Order ID:</strong> ${orderState.orderId}</div>
-    <button class="btn" onclick="addMedicationToChart()">Add medication to chart</button>
-    `;
-  }
+      .panel-header h2 {
+        margin: 0;
+        font-size: 28px;
+        color: #142338;
+      }
 
-function shippingLookup() {
-    return `
-    <p>Search for the shipment using the same order ID, then resolve the mismatch in the tracking details.</p>
-      <div class="form-group">
-      <label for="shippingOrderId">Order ID</label>
-      <input type="text" id="shippingOrderId" placeholder="Enter the order ID" value="${orderState.orderId}" />
-      <div id="shippingOrderError" class="error-text">Order not found. Check the ID or the shipping label details.</div>
-      </div>
-    <div class="scratchpad">
-      <strong>Tracking note</strong>
-      The order is present in the pharmacy system, but the shipping record shows a different packaging ID. Review and reconcile the mismatch before continuing.
-    </div>
-    <button class="btn" onclick="checkShippingLabel()">Check shipment</button>
-  `;
-}
+      .system-tag {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--slate-2);
+        margin-top: 6px;
+        font-weight: 700;
+      }
 
-function finalSummary() {
-  return `
-    <h3 style="color:#15803d;">Workflow complete</h3>
-    <p>The pharmacy order moved through multiple disconnected systems, and the shipping mismatch was resolved after another login and extra lookup.</p>
-    <div class="token-box">
-      <strong>Order ID:</strong> ${orderState.orderId}<br>
-      <strong>Medication:</strong> ${orderState.medication}<br>
-      <strong>Patient:</strong> ${orderState.patientId}<br>
-      <strong>Shipping label:</strong> ${orderState.shippingLabel || "Tracked after reconciliation"}<br>
-      <strong>Chart status:</strong> ${orderState.chartStatus || "Updated"}
-    </div>
-    <button class="btn" onclick="location.reload()">Restart workflow</button>
-  `;
-}
+      .content {
+        padding: 28px;
+      }
 
-function goTo(step) {
-  currentStep = step;
-  renderCurrentScreen();
-}
+      .lead {
+        margin: 0 0 18px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #243244;
+      }
 
-function renderCurrentScreen() {
-  const screen = screens[currentStep - 1];
-  document.getElementById("stepIndicator").innerText = `${currentStep} of ${screens.length}`;
-  document.getElementById("portalContainer").innerHTML = `
-    <div class="portal-banner">
+      .field {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 7px;
+        color: #364152;
+      }
+
+      input, select {
+        width: 100%;
+        border: 1px solid #a4b4c2;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 14px;
+        background: white;
+        color: #1b2430;
+      }
+
+      input:focus, select:focus {
+        outline: 2px solid rgba(11, 108, 191, 0.2);
+        border-color: var(--blue);
+      }
+
+      .error {
+        display: none;
+        margin-top: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--red);
+      }
+
+      .error.visible { display: block; }
+
+      .button-row {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .browser-tabs {
+        max-width: 980px;
+        margin: 0 auto 18px;
+        display: flex;
+        gap: 8px;
+        background: #eaeef3;
+        border: 1px solid var(--line);
+        border-radius: 12px 12px 0 0;
+        padding: 10px 12px 0;
+      }
+
+      .browser-tab {
+        border: 1px solid transparent;
+        border-bottom: none;
+        background: #edf2f7;
+        color: var(--navy);
+        border-radius: 10px 10px 0 0;
+        padding: 10px 16px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        min-width: 160px;
+      }
+
+      .browser-tab.active {
+        background: var(--panel);
+        border-color: var(--line);
+        box-shadow: 0 -4px 12px rgba(18, 61, 102, 0.04);
+      }
+
+      button {
+        border: none;
+        border-radius: 8px;
+        background: var(--blue);
+        color: white;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        filter: brightness(0.96);
+      }
+
+      button.secondary {
+        background: #7c8a9b;
+      }
+
+      .notes-actions {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .restart-button,
+      .portal-back button {
+        background: transparent;
+        color: var(--navy);
+        border: 1px solid var(--line);
+        box-shadow: none;
+      }
+
+      .restart-button:hover,
+      .portal-back button:hover {
+        background: #f8fafc;
+        filter: none;
+      }
+
+      .portal-back {
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .ghost-button {
+        background: transparent;
+        color: var(--navy);
+        border: 1px solid var(--line);
+        box-shadow: none;
+      }
+
+      .ghost-button:hover {
+        background: #f8fafc;
+        filter: none;
+      }
+
+      .action-stack {
+        margin-top: 22px;
+      }
+
+      .action-stack .button-row {
+        justify-content: flex-end;
+        margin-top: 0;
+      }
+
+      .separator-row {
+        margin-top: 0 !important;
+        padding-top: 0;
+      }
+
+      .field-hint {
+        display: block;
+        margin-top: 6px;
+        color: var(--slate-2);
+        font-size: 12px;
+      }
+      .note {
+        background: #fff7e7;
+        border: 1px solid #f6d591;
+        color: #6d4a05;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-top: 16px;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .note strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .token {
+        background: #f3f7fb;
+        border: 1px dashed #9fb2c8;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin: 18px 0;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #1d2a39;
+      }
+
+      .success {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .status-bar {
+        max-width: 980px;
+        margin: 18px auto 0;
+        display: flex;
+        justify-content: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
       <div>
-        <h2>${screen.title}</h2>
-        <div class="portal-system-tag">${screen.tag}</div>
+        <strong>Pharmacy workflow</strong>
+        <span id="workflowLabel">Pharmacy workflow</span>
       </div>
+      <div class="step-pill" id="stepBadge">Step 1 / 8</div>
     </div>
-    <div>${screen.render()}</div>
-  `;
-  updateHandoffNotes();
-}
 
-function updateHandoffNotes() {
-  const notes = [];
-  if (orderState.orderId) notes.push(`Order ID: ${orderState.orderId}`);
-  if (orderState.shippingLabel) notes.push(`Shipping label: ${orderState.shippingLabel}`);
-  if (orderState.patientId) notes.push(`Patient: ${orderState.patientId}`);
-  document.getElementById("clipboardDisplay").innerText = notes.join(" | ") || "No order data yet.";
-}
+    <div class="browser-tabs">
+      <button type="button" class="browser-tab active" data-tab="pharmacy">Pharmacy portal</button>
+      <button type="button" class="browser-tab" data-tab="ehr">EHR</button>
+      <button type="button" class="browser-tab" data-tab="shipping">Shipping portal</button>
+    </div>
 
-function showError(id, visible) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = visible ? "block" : "none";
-}
+    <div class="shell">
+      <div class="panel-header">
+        <div>
+          <h2 id="screenTitle">RxFlow Portal</h2>
+          <div class="system-tag" id="screenTag">Pharmacy portal · sign in</div>
+        </div>
+      </div>
 
-function submitLogin(system) {
-  const userId = `${system}User`;
-  const passwordId = `${system}Password`;
-  const user = document.getElementById(userId)?.value.trim() || "";
-  const password = document.getElementById(passwordId)?.value || "";
-  const userError = `${userId}Error`;
-  const passwordError = `${passwordId}Error`;
+      <div class="content" id="screenContent"></div>
+    </div>
 
-  const validUser = system === "procurement" ? user.length > 0 :
-    system === "ehr" ? user.includes("@") : user.length > 0;
-  const validPassword = password.length > 0;
+    <div class="status-bar">
+      <button type="button" class="restart-button" id="statusActionButton" onclick="restart()">Restart prototype</button>
+    </div>
 
-  showError(userError, !validUser);
-  showError(passwordError, !validPassword);
-  if (!validUser || !validPassword) return;
+    <script>
+      const state = {
+        orderId: '',
+        ndc: 'NDC-00703-9121-01',
+        medicationChoice: '',
+        redoMedicationChoice: '',
+        medicationQuantity: 0,
+        redoMedicationQuantity: 0,
+        redoCostCenter: '',
+        chartMedication: '',
+        chartQuantity: 0,
+        costCenter: '',
+        patientId: '',
+        chartStatus: '',
+        shippingLabel: '',
+        trackingNumber: '',
+        procurementUser: '',
+        procurementPass: '',
+        ehrEmail: '',
+        ehrPass: '',
+        shippingUser: '',
+        shippingPass: '',
+        shipmentLookup: '',
+        shippingPasswordFailed: false,
+        shippingRecoveryUsed: false,
+        shippingNeedsPasswordChange: false,
+        shippingPasswordReset: false,
+        loggedOutAfterRedo: false,
+        ehrSignedOut: false,
+        pharmacySessionTimedOut: false,
+        pharmacyTimeout: null,
+        pharmacyTimeoutConsumed: false,
+        pharmacyReauthDestination: 'pharmacyHome',
+        statusLookupOrderId: '',
+        statusLookupMedication: '',
+        statusLookupQuantity: 0,
+        statusLookupStatus: '',
+        statusLookupMatched: null,
+        startTime: Date.now(),
+        loginAttempts: { pharmacy: 0, ehr: 0, shipping: 0 },
+        errorCodes: [],
+        signOutMisses: 0,
+        manualSignOuts: 0,
+        abandonedSignOuts: 0,
+        portalState: { pharmacy: false, ehr: false, shipping: false },
+        activeTab: 'pharmacy'
+      };
 
-  if (system === "procurement") {
-    orderState.procurementUsername = user;
-    orderState.procurementPassword = password;
-    goTo(2);
-    return;
-  }
+      const medicationNames = {
+        'NDC-00703-9121-01': 'Ceftriaxone 1g IV Vials',
+        'NDC-00093-0101-56': 'Amoxicillin 500mg',
+        'NDC-00456-1200-01': 'Azithromycin 250mg',
+        'NDC-00012-3456-01': 'Amoxicillin 250mg',
+        'NDC-00012-3456-02': 'Amoxicillin 875mg',
+        'NDC-00012-3456-03': 'Azithromycin 500mg',
+        'NDC-00012-3456-04': 'Ceftriaxone 500mg IV Vials',
+        'NDC-00012-3456-05': 'Ceftriaxone 2g IV Vials'
+      };
 
-  if (system === "ehr") {
-    orderState.ehrEmail = user;
-    orderState.ehrPassword = password;
-    goTo(5);
-      return;
-    }
+      function medicationName(code) {
+        return medicationNames[code] || 'Not selected';
+      }
 
-  if (system === "shipping") {
-    orderState.shippingUsername = user;
-    orderState.shippingPassword = password;
-    if (user !== "shipops" || password !== "Transit#14") {
-      orderState.shippingAttempts += 1;
-      showError("shippingUserError", true);
-      showError("shippingPasswordError", true);
-      document.getElementById("shippingUserError").innerText = "Incorrect shipping credentials. Try the shipping account, not the pharmacy login.";
-      document.getElementById("shippingPasswordError").innerText = "Incorrect shipping credentials. Re-check the username/password hint.";
-      return;
-    }
-    goTo(7);
-  }
-  }
+      function pharmacyMedicationOptions() {
+        return Object.entries(medicationNames)
+          .map(([code, name]) => `<option value="${code}">${name}</option>`)
+          .join('');
+      }
 
-function submitMedicationTask() {
-  const medication = document.getElementById("medication").value;
-  const quantity = Number(document.getElementById("quantity").value);
-  const validMedication = medication === orderState.ndc;
-  const validQuantity = Number.isInteger(quantity) && quantity >= 1 && quantity <= 5;
-  showError("medicationError", !validMedication);
-  showError("quantityError", !validQuantity);
-  if (!validMedication || !validQuantity) return;
+      function getPharmacyOrders() {
+        const orders = [];
+        if (state.orderId && state.medicationChoice) {
+          orders.push({
+            medication: state.medicationChoice,
+            quantity: state.medicationQuantity
+          });
+        }
+        if (state.orderId && state.redoMedicationChoice) {
+          orders.push({
+            medication: state.redoMedicationChoice,
+            quantity: state.redoMedicationQuantity
+          });
+        }
+        return orders;
+      }
 
-  orderState.quantity = quantity;
-  goTo(3);
-}
+      function escapeHtml(value) {
+        return value.replace(/[&<>"']/g, character => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[character]);
+      }
 
-function submitOrderTask() {
-  const costCenter = document.getElementById("costCenter").value.trim();
-  const valid = /^CC-\d{4}-RX$/.test(costCenter);
-  showError("costCenterError", !valid);
-  if (!valid) return;
+      const screens = {
+        loginPortal: {
+          title: 'RxFlow Portal',
+          tag: 'Pharmacy portal · sign in',
+          render: () => `
+            <div class="field">
+              <label for="procurementUser">Username</label>
+              <input id="procurementUser" type="text" placeholder="name.name" />
+              <div class="error" id="procurementUserError">Incorrect username.</div>
+            </div>
+            <div class="field">
+              <label for="procurementPass">Password</label>
+              <input id="procurementPass" type="password" placeholder="Enter your password" />
+              <div class="error" id="procurementPassError">Enter your password.</div>
+            </div>
+            <div class="button-row">
+              <button type="button" onclick="submitProcurementLogin()">Sign in</button>
+            </div>
+          `
+        },
+        pharmacyHome: {
+          title: 'Pharmacy portal',
+          tag: 'Pharmacy portal · select a task',
+          render: () => `
+            <p class="lead">What would you like to do?</p>
+            <div class="button-row">
+              <button type="button" onclick="goTo('orderTask')">Order medication</button>
+              <button type="button" class="ghost-button" onclick="goTo('pharmacyStatusLookup')">Check the status of an order</button>
+            </div>
+          `
+        },
+        orderTask: {
+          title: 'Medication order',
+          tag: 'Pharmacy portal · order entry',
+          render: () => `
+            <div class="field">
+              <label for="medicationSelect">Medication</label>
+              <select id="medicationSelect">
+                <option value="">Select a medication</option>
+                ${pharmacyMedicationOptions()}
+              </select>
+              <div class="error" id="medicationError">Select the correct medication.</div>
+            </div>
+            <div class="field">
+              <label for="quantityInput">Quantity</label>
+              <input id="quantityInput" type="number" min="1" max="5" value="1" />
+              <div class="error" id="quantityError">Enter a quantity from 1 to 5.</div>
+            </div>
+            <button type="button" onclick="submitMedicationTask()">Save medication</button>
+          `
+        },
+        pharmacyStatusLookup: {
+          title: 'Check order status',
+          tag: 'Pharmacy portal · order lookup',
+          render: () => {
+            return `
+            <div class="field">
+              <label for="pharmacyStatusOrder">Medication</label>
+              <select id="pharmacyStatusOrder">
+                <option value="">Select a medication</option>
+                ${pharmacyMedicationOptions()}
+              </select>
+            </div>
+            <button type="button" onclick="checkPharmacyOrderStatus()">View order details</button>
+            `;
+          }
+        },
+        pharmacyStatusFound: {
+          title: 'Order status',
+          tag: 'Pharmacy portal · order lookup',
+          render: () => `
+            ${state.statusLookupOrderId
+              ? `<p class="lead success">Order ${state.statusLookupOrderId} is processing.</p>
+                <div class="token">
+                  <strong>Order status</strong>
+                  Order ID: ${state.statusLookupOrderId}<br />
+                  Medication: ${state.statusLookupMedication}<br />
+                  ${state.statusLookupMatched ? `Quantity: ${state.statusLookupQuantity} case pack(s)<br />` : ''}
+                  Status: ${state.statusLookupStatus}
+                </div>`
+              : `<p class="lead">There are no active orders for ${state.statusLookupMedication}.</p>`}
+            <button type="button" onclick="goTo('pharmacyHome')">Return to pharmacy tasks</button>
+          `
+        },
+        finalizeOrder: {
+          title: 'Finalize order',
+          tag: 'Pharmacy portal · billing',
+          render: () => `
+            <div class="field">
+              <label for="costCenterInput">Hospital cost center</label>
+              <input id="costCenterInput" type="text" placeholder="CC-XXXX-RX" />
+              <div class="error" id="costCenterError">Enter a cost center in the format CC-####-RX.</div>
+            </div>
+            <div class="token">
+              <strong>Order details</strong>
+              Medication: ${medicationName(state.medicationChoice)}<br />
+              Quantity: ${state.medicationQuantity} case pack(s)
+            </div>
+            <button type="button" onclick="submitOrder()">Submit order</button>
+          `
+        },
+        portalExpired: {
+          title: 'Session expired',
+          tag: 'Pharmacy portal · re-entry required',
+          render: () => `
+            <div class="button-row">
+              <button type="button" onclick="goTo('loginPortalAgain')">Sign in</button>
+            </div>
+          `
+        },
+        loginPortalAgain: {
+          title: 'RxFlow Portal',
+          tag: 'Pharmacy portal · re-authentication',
+          render: () => `
+            <div class="field">
+              <label for="procurementUserAgain">Username</label>
+              <input id="procurementUserAgain" type="text" placeholder="name.name" />
+              <div class="error" id="procurementUserAgainError">Incorrect username or password.</div>
+            </div>
+            <div class="field">
+              <label for="procurementPassAgain">Password</label>
+              <input id="procurementPassAgain" type="password" placeholder="Enter your password" />
+              <div class="error" id="procurementPassAgainError">Incorrect username or password.</div>
+            </div>
+            <div class="button-row">
+              <button type="button" onclick="submitProcurementLoginAgain()">Continue</button>
+            </div>
+          `
+        },
+        redoOrderTask: {
+          title: 'Medication order',
+          tag: 'Pharmacy portal · order entry',
+          render: () => `
+            <div class="field">
+              <label for="redoMedicationSelect">Medication</label>
+              <select id="redoMedicationSelect">
+                <option value="">Select a medication</option>
+                ${pharmacyMedicationOptions()}
+              </select>
+              <div class="error" id="redoMedicationError">Choose a medication.</div>
+            </div>
+            <div class="field">
+              <label for="redoQuantityInput">Quantity</label>
+              <input id="redoQuantityInput" type="number" min="1" max="5" value="1" />
+              <div class="error" id="redoQuantityError">Enter a quantity from 1 to 5.</div>
+            </div>
+            <button type="button" onclick="submitRedoMedicationTask()">Save medication</button>
+          `
+        },
+        redoFinalizeOrder: {
+          title: 'Finalize order',
+          tag: 'Pharmacy portal · billing',
+          render: () => `
+            <div class="field">
+              <label for="redoCostCenterInput">Hospital cost center</label>
+              <input id="redoCostCenterInput" type="text" placeholder="CC-XXXX-RX" />
+            </div>
+            <div class="token">
+              <strong>Order details</strong>
+              Medication: ${medicationName(state.redoMedicationChoice)}<br />
+              Quantity: ${state.redoMedicationQuantity} case pack(s)
+            </div>
+            <button type="button" onclick="submitRedoOrder()">Submit order</button>
+          `
+        },
+        redoSignOff: {
+          title: 'Order completed',
+          tag: 'Pharmacy portal · order confirmation',
+          render: () => `
+            <div class="token">
+              <strong>Order confirmation</strong>
+              Order ID: ${state.orderId}<br />
+              Medication: ${medicationName(state.redoMedicationChoice)}<br />
+              Quantity: ${state.redoMedicationQuantity} case pack(s)
+            </div>
+            <div class="action-stack">
+              <div class="button-row separator-row">
+                <button type="button" class="ghost-button" onclick="submitRedoSignOff()">Sign out</button>
+              </div>
+            </div>
+          `
+        },
+        pharmacySignedOut: {
+          title: 'Signed out of pharmacy portal',
+          tag: 'Pharmacy portal · signed out',
+          render: () => `
+            <p class="lead">You have signed out of the pharmacy portal.</p>
+            <div class="button-row">
+              <button type="button" class="ghost-button" onclick="signInToPharmacyAgain()">Sign in again</button>
+            </div>
+          `
+        },
+        ehrLogin: {
+          title: 'ChartOne EHR',
+          tag: 'External EHR · signed out',
+          render: () => `
+            <div class="field">
+              <label for="ehrEmail">Username</label>
+              <input id="ehrEmail" type="email" placeholder="name.name@example.com" />
+              <div class="error" id="ehrEmailError">Incorrect username.</div>
+            </div>
+            <div class="field">
+              <label for="ehrPass">Password</label>
+              <input id="ehrPass" type="password" placeholder="Enter your password" />
+              <div class="error" id="ehrPassError">Incorrect password.</div>
+            </div>
+            <button type="button" onclick="submitEhrLogin()">Sign in</button>
+          `
+        },
+        ehrChart: {
+          title: 'Patient chart',
+          tag: 'External EHR · medication review',
+          render: () => `
+            <div class="field">
+              <label for="ehrMedicationSelect">Medication</label>
+              <select id="ehrMedicationSelect">
+                <option value="">Select a medication</option>
+                <option value="NDC-00456-1200-01">Azithromycin 250mg</option>
+                <option value="NDC-00093-0101-56">Amoxicillin 500mg</option>
+                <option value="NDC-00703-9121-01">Ceftriaxone 1g IV Vials</option>
+              </select>
+              <div class="error" id="ehrMedicationError">Use the same medication you selected in the pharmacy portal.</div>
+            </div>
+            <div class="field">
+              <label for="ehrQuantityInput">Quantity</label>
+              <input id="ehrQuantityInput" type="number" min="1" max="5" placeholder="Enter a quantity" />
+              <small class="field-hint">Enter a quantity from 1 to 5 case packs.</small>
+              <div class="error" id="ehrQuantityError">Enter a quantity from 1 to 5.</div>
+            </div>
+            <div class="field">
+              <label for="patientIdInput">Patient name</label>
+              <input id="patientIdInput" type="text" />
+              <div class="error" id="patientIdError">Enter a patient name.</div>
+            </div>
+            <button type="button" onclick="submitPatientChart()">Add medication to chart</button>
+          `
+        },
+        ehrSignOff: {
+          title: 'Chart updated',
+          tag: 'External EHR · sign off',
+          render: () => `
+            <p class="lead">Patient record update updated.</p>
+            <div class="action-stack">
+              <div class="button-row separator-row">
+                <button type="button" class="ghost-button" onclick="submitEhrSignOff()">Sign out</button>
+              </div>
+            </div>
+          `
+        },
+        ehrSignedOut: {
+          title: 'Signed out of EHR',
+          tag: 'External EHR · signed out',
+          render: () => `
+            <p class="lead">You have signed out of the EHR.</p>
+            <div class="button-row">
+              <button type="button" class="ghost-button" onclick="goTo('ehrLogin')">Sign in again</button>
+            </div>
+          `
+        },
+        shippingLogin: {
+          title: 'ShipTrack',
+          tag: 'Shipping portal · sign in',
+          render: () => `
+            <div class="field">
+              <label for="shippingUser">Username</label>
+              <input id="shippingUser" type="text" placeholder="name.name" />
+              <div class="error" id="shippingUserError">Incorrect username.</div>
+            </div>
+            <div class="field">
+              <label for="shippingPass">Password</label>
+              <input id="shippingPass" type="password" placeholder="Enter your password" />
+              <div class="error" id="shippingPassError">Incorrect password.</div>
+            </div>
+            <button type="button" onclick="submitShippingLogin()">Sign in</button>
+          `
+        },
+        shippingPasswordChange: {
+          title: 'Review shipping password',
+          tag: 'Shipping portal · password change',
+          render: () => `
+            <p class="lead">Choose a new password for your shipping account. You will use it to sign in after changing it.</p>
+            <div class="field">
+              <label for="shippingNewPassword">New password</label>
+              <input id="shippingNewPassword" type="password" />
+              <div class="error" id="shippingNewPasswordError">Enter a password to continue.</div>
+            </div>
+            <button type="button" onclick="completeShippingPasswordChange()">Save new password</button>
+          `
+        },
+        shippingLookup: {
+          title: 'Shipment status',
+          tag: 'Shipping portal · tracking',
+          render: () => `
+            <div class="field">
+              <label for="shipmentLookupInput">Order ID</label>
+              <input id="shipmentLookupInput" type="text" value="" placeholder="Enter an order ID" />
+              <div class="error" id="shipmentLookupError">Order not found. Check the order details and try again.</div>
+            </div>
+            <button type="button" onclick="submitShipmentLookup()">Check shipment</button>
+          `
+        },
+        shipmentLocated: {
+          title: 'Shipment located',
+          tag: 'Shipping portal · delivery confirmation',
+          render: () => `
+            <p class="lead success">The shipment for this order has been located.</p>
+            <div class="token">
+              <strong>Shipment details</strong>
+              Shipping ID: ${state.shippingLabel}<br />
+              Medication: ${medicationName(state.redoMedicationChoice)}<br />
+              Tracking number: ${state.trackingNumber}<br />
+              Tracking status: In transit
+            </div>
+          `
+        },
+        summary: {
+          title: 'Workflow complete',
+          tag: 'Final experience overview',
+          render: () => {
+            const firstOrderMedication = medicationName(state.medicationChoice);
+            const completedOrderMedication = medicationName(state.redoMedicationChoice);
+            const chartMedication = medicationName(state.chartMedication);
+            const medicationCompleted = Boolean(state.medicationChoice && state.redoMedicationChoice && state.chartMedication);
+            const medicationConsistent = state.medicationChoice === state.redoMedicationChoice &&
+              state.redoMedicationChoice === state.chartMedication;
+            const pharmacySignout = state.loggedOutAfterRedo ? 'Yes' : 'No';
+            const ehrSignout = state.ehrSignedOut ? 'Yes' : 'No';
+            const totalLogins = Object.values(state.loginAttempts).reduce((sum, value) => sum + value, 0);
+            const elapsedSeconds = Math.max(1, Math.round((Date.now() - state.startTime) / 1000));
+            const openPortals = Object.entries(state.portalState)
+              .filter(([, isOpen]) => isOpen)
+              .map(([portal]) => portal === 'ehr' ? 'EHR' : portal === 'shipping' ? 'Shipping portal' : 'Pharmacy portal');
 
-  orderState.costCenter = costCenter;
-  orderState.orderId = `REQ-PR-${Math.floor(10000 + Math.random() * 90000)}`;
-  goTo(4);
-}
+            return `
+              <div class="token">
+                <strong>Workflow summary</strong>
+                Successful logins: ${totalLogins}<br />
+                Error codes triggered: ${state.errorCodes.length ? state.errorCodes.join(', ') : 'None'}<br />
+                Manual sign-outs: ${state.manualSignOuts}<br />
+                Sign-out pages abandoned without signing out: ${state.abandonedSignOuts}<br />
+                Missed sign-outs: ${state.signOutMisses}<br />
+                Still-open applications: ${openPortals.length ? openPortals.join(', ') : 'None'}<br />
+                Pharmacy session timed out: ${state.pharmacySessionTimedOut ? 'Yes' : 'No'}<br />
+                First pharmacy selection: ${firstOrderMedication} (${state.medicationQuantity} case pack(s))<br />
+                Completed pharmacy order: ${completedOrderMedication} (${state.redoMedicationQuantity} case pack(s))<br />
+                EHR chart entry: ${chartMedication} (${state.chartQuantity} case pack(s))<br />
+                Medication consistent throughout: ${medicationCompleted ? (medicationConsistent ? 'Yes' : 'No') : 'Incomplete'}<br />
+                Order lookup medication: ${state.statusLookupMedication || 'Not selected'}<br />
+                Correct medication selected for lookup: ${state.statusLookupMatched === null ? 'Not checked' : (state.statusLookupMatched ? 'Yes' : 'No — wrong medication selected')}<br />
+                Initial cost center: ${escapeHtml(state.costCenter)}<br />
+                Completed order cost center: ${escapeHtml(state.redoCostCenter)}<br />
+                Order ID: ${state.orderId}<br />
+                Shipping ID: ${state.shippingLabel}<br />
+                Tracking number: ${state.trackingNumber}<br />
+                Patient: ${escapeHtml(state.patientId)}<br />
+                Shipping account recovery used: ${state.shippingRecoveryUsed ? 'Yes' : 'No'}<br />
+                Shipping password reset: ${state.shippingPasswordReset ? 'Yes' : 'No'}<br />
+                Pharmacy portal manually signed out: ${pharmacySignout}<br />
+                EHR manually signed out: ${ehrSignout}<br />
+                Completion time: ${elapsedSeconds} seconds<br />
+              </div>
+            `;
+          }
+        }
+      };
 
-function addMedicationToChart() {
-  const patientId = document.getElementById("patientId").value.trim();
-  showError("patientError", !patientId);
-  if (!patientId) return;
+      const stepOrder = [
+        'loginPortal',
+        'pharmacyHome',
+        'orderTask',
+        'pharmacyStatusLookup',
+        'pharmacyStatusFound',
+        'finalizeOrder',
+        'portalExpired',
+        'loginPortalAgain',
+        'redoOrderTask',
+        'redoFinalizeOrder',
+        'redoSignOff',
+        'pharmacySignedOut',
+        'ehrLogin',
+        'ehrChart',
+        'ehrSignOff',
+        'ehrSignedOut',
+        'shippingLogin',
+        'shippingPasswordChange',
+        'shippingLookup',
+        'shipmentLocated',
+        'summary'
+      ];
 
-  orderState.patientId = patientId;
-  orderState.chartStatus = "Medication added";
-  goTo(6);
-}
+      let stepIndex = 0;
 
-function checkShippingLabel() {
-  const enteredId = document.getElementById("shippingOrderId").value.trim();
-  const valid = enteredId === orderState.orderId;
-  showError("shippingOrderError", !valid);
-  if (!valid) {
-    orderState.shipmentMismatch = true;
-    return;
-  }
+      function goTo(stepName) {
+        const currentKey = stepOrder[stepIndex];
+        recordSignOutPageAbandonment(currentKey);
+        const idx = stepOrder.indexOf(stepName);
+        if (idx !== -1) stepIndex = idx;
+        render();
+      }
 
-  orderState.shippingLabel = `LBL-${Math.floor(1000000 + Math.random() * 9000000)}`;
-  orderState.shipmentMismatch = false;
-  goTo(8);
-}
+      function recordSignOutPageAbandonment(currentKey, tabSwitch = false, nextTab = '') {
+        if (currentKey === 'redoSignOff' && !state.loggedOutAfterRedo) {
+          state.abandonedSignOuts += 1;
+          state.signOutMisses += 1;
+          recordErrorCode('Missed sign-out.');
+          if (tabSwitch && ['ehr', 'shipping'].includes(nextTab) &&
+            !state.pharmacyTimeout && !state.pharmacyTimeoutConsumed) {
+            state.pharmacyTimeout = setTimeout(() => {
+              state.pharmacyTimeout = null;
+              state.pharmacyTimeoutConsumed = true;
+              if (state.portalState.pharmacy && !state.loggedOutAfterRedo) {
+                state.portalState.pharmacy = false;
+                state.pharmacySessionTimedOut = true;
+                state.pharmacyReauthDestination = 'pharmacyHome';
+                if (state.activeTab === 'pharmacy') {
+                  stepIndex = stepOrder.indexOf('loginPortalAgain');
+                  render();
+                }
+              }
+            }, 60000);
+          }
+        }
+        if (currentKey === 'ehrSignOff' && !state.ehrSignedOut) {
+          state.abandonedSignOuts += 1;
+          state.signOutMisses += 1;
+          recordErrorCode('Missed sign-out.');
+        }
+      }
 
-renderCurrentScreen();
-</script>
-</body>
+      function getBackTarget(currentKey) {
+        if (currentKey === 'orderTask' || currentKey === 'pharmacyStatusLookup') return 'pharmacyHome';
+        const currentIndex = stepOrder.indexOf(currentKey);
+        if (currentIndex === -1) return null;
+
+        const currentPortal = currentKey === 'shipmentLocated'
+          ? 'shipping'
+          : currentKey.includes('ehr') ? 'ehr' : currentKey.includes('shipping') ? 'shipping' : 'pharmacy';
+        const portalSteps = stepOrder.filter(step => {
+          if (currentPortal === 'ehr') return step.includes('ehr');
+          if (currentPortal === 'shipping') return step.includes('shipping') || step === 'shipmentLocated' || step === 'summary';
+          return !step.includes('ehr') && !step.includes('shipping') && step !== 'summary';
+        });
+
+        const indexInPortal = portalSteps.indexOf(currentKey);
+        if (indexInPortal <= 0) return null;
+        return portalSteps[indexInPortal - 1];
+      }
+
+      function recordErrorCode(code) {
+        if (!code || state.errorCodes.includes(code)) return;
+        state.errorCodes.push(code);
+      }
+
+      function validateUsername(value, pattern) {
+        const username = value.trim();
+        return new RegExp(`^${pattern}$`, 'i').test(username);
+      }
+
+      function switchPortalTab(tab) {
+        if (tab === state.activeTab) return;
+        const currentKey = stepOrder[stepIndex];
+        recordSignOutPageAbandonment(currentKey, true, tab);
+        if (tab === 'pharmacy' && !state.portalState.pharmacy) {
+          state.pharmacyReauthDestination = 'pharmacyHome';
+        }
+        state.activeTab = tab;
+        const map = {
+          pharmacy: state.portalState.pharmacy
+            ? (state.loggedOutAfterRedo || !state.orderId ? 'pharmacyHome' : 'redoSignOff')
+            : (state.pharmacySessionTimedOut ? 'loginPortalAgain' : 'loginPortal'),
+          ehr: state.portalState.ehr ? 'ehrChart' : 'ehrLogin',
+          shipping: state.shippingNeedsPasswordChange
+            ? 'shippingPasswordChange'
+            : state.portalState.shipping ? 'shippingLookup'
+                : 'shippingLogin'
+        };
+
+        const target = map[tab];
+        const idx = stepOrder.indexOf(target);
+        if (idx !== -1) stepIndex = idx;
+        render();
+      }
+
+      function render() {
+        const currentKey = stepOrder[stepIndex];
+        const screen = screens[currentKey];
+        const backTarget = getBackTarget(currentKey);
+        const backMarkup = backTarget &&
+          !['portalExpired', 'pharmacySignedOut', 'ehrSignedOut'].includes(currentKey)
+          ? `<div class="portal-back"><button type="button" onclick="goTo('${backTarget}')">Back</button></div>`
+          : '';
+
+        if (currentKey === 'shipmentLocated' || currentKey === 'summary') state.activeTab = 'shipping';
+        else if (currentKey.includes('ehr')) state.activeTab = 'ehr';
+        else if (currentKey.includes('shipping')) state.activeTab = 'shipping';
+        else state.activeTab = 'pharmacy';
+
+        document.querySelectorAll('.browser-tab').forEach((tabButton) => {
+          tabButton.classList.toggle('active', tabButton.dataset.tab === state.activeTab);
+        });
+
+        document.getElementById('screenTitle').textContent = screen.title;
+        document.getElementById('screenTag').textContent = screen.tag;
+        document.getElementById('screenContent').innerHTML = `${screen.render()}${backMarkup}`;
+        const statusActionButton = document.getElementById('statusActionButton');
+        statusActionButton.textContent = currentKey === 'shipmentLocated' ? 'View workflow summary' : 'Restart prototype';
+        statusActionButton.onclick = currentKey === 'shipmentLocated'
+          ? () => goTo('summary')
+          : restart;
+        document.getElementById('stepBadge').textContent = `Step ${stepIndex + 1} / ${stepOrder.length}`;
+        document.getElementById('workflowLabel').textContent = currentKey.includes('ehr') ? 'External chart workflow' : currentKey.includes('shipping') ? 'Shipment workflow' : 'Pharmacy workflow';
+      }
+
+      function showError(id, shouldShow) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('visible', shouldShow);
+      }
+
+      function submitProcurementLogin() {
+        const username = document.getElementById('procurementUser').value.trim();
+        const password = document.getElementById('procurementPass').value;
+        const usernameValid = validateUsername(username, '[a-z]+\\.[a-z]+');
+        const passwordValid = password.length > 0;
+
+        showError('procurementUserError', !usernameValid);
+        showError('procurementPassError', !passwordValid);
+        if (!usernameValid || !passwordValid) {
+          if (!usernameValid) recordErrorCode('Incorrect username.');
+          if (!passwordValid) recordErrorCode('Incorrect password.');
+          return;
+        }
+
+        state.procurementUser = username;
+        state.procurementPass = password;
+        state.loginAttempts.pharmacy += 1;
+        state.portalState.pharmacy = true;
+        state.activeTab = 'pharmacy';
+        stepIndex = stepOrder.indexOf('pharmacyHome');
+        render();
+      }
+
+      function submitMedicationTask() {
+        const medication = document.getElementById('medicationSelect').value;
+        const quantity = Number(document.getElementById('quantityInput').value || 0);
+
+        const qtyValid = Number.isInteger(quantity) && quantity >= 1 && quantity <= 5;
+        const medsValid = medication.length > 0;
+
+        showError('medicationError', !medsValid);
+        showError('quantityError', !qtyValid);
+        if (!medsValid || !qtyValid) return;
+
+        state.medicationChoice = medication;
+        state.medicationQuantity = quantity;
+        stepIndex = stepOrder.indexOf('finalizeOrder');
+        render();
+      }
+
+      function checkPharmacyOrderStatus() {
+        const medication = document.getElementById('pharmacyStatusOrder').value;
+        if (!medication) return;
+        const order = getPharmacyOrders().find(item => item.medication === medication);
+        state.statusLookupMatched = Boolean(order);
+        state.statusLookupOrderId = state.orderId;
+        state.statusLookupMedication = medicationName(medication);
+        state.statusLookupQuantity = order ? order.quantity : 0;
+        state.statusLookupStatus = state.orderId ? 'Processing' : 'No active orders';
+        stepIndex = stepOrder.indexOf('pharmacyStatusFound');
+        render();
+      }
+
+      function submitOrder() {
+        const costCenter = document.getElementById('costCenterInput').value.trim();
+        const valid = /^CC-\d{4}-RX$/.test(costCenter);
+        showError('costCenterError', !valid);
+        if (!valid) return;
+
+        state.costCenter = costCenter;
+        state.orderId = `REQ-${Math.floor(100000 + Math.random() * 900000)}`;
+        state.pharmacyReauthDestination = 'redoOrderTask';
+        stepIndex = stepOrder.indexOf('portalExpired');
+        render();
+      }
+
+      function submitProcurementLoginAgain() {
+        const username = document.getElementById('procurementUserAgain').value.trim();
+        const password = document.getElementById('procurementPassAgain').value;
+
+        const validUser = validateUsername(username, state.procurementUser || '[a-z]+\\.[a-z]+');
+        const validPass = password === state.procurementPass;
+        showError('procurementUserAgainError', !validUser);
+        showError('procurementPassAgainError', !validPass);
+        if (!validUser || !validPass) {
+          if (!validUser) recordErrorCode('Incorrect username.');
+          if (!validPass) recordErrorCode('Incorrect password.');
+          return;
+        }
+
+        state.procurementUser = username;
+        state.procurementPass = password;
+        state.loginAttempts.pharmacy += 1;
+        state.portalState.pharmacy = true;
+        state.activeTab = 'pharmacy';
+        stepIndex = stepOrder.indexOf(state.pharmacyReauthDestination);
+        render();
+      }
+
+      function signInToPharmacyAgain() {
+        state.pharmacyReauthDestination = 'pharmacyHome';
+        goTo('loginPortalAgain');
+      }
+
+      function submitRedoMedicationTask() {
+        const medication = document.getElementById('redoMedicationSelect').value;
+        const quantity = Number(document.getElementById('redoQuantityInput').value || 0);
+
+        const qtyValid = Number.isInteger(quantity) && quantity >= 1 && quantity <= 5;
+        const medsValid = medication.length > 0;
+
+        showError('redoMedicationError', !medsValid);
+        showError('redoQuantityError', !qtyValid);
+        if (!medsValid || !qtyValid) return;
+
+        state.redoMedicationChoice = medication;
+        state.redoMedicationQuantity = quantity;
+        stepIndex = stepOrder.indexOf('redoFinalizeOrder');
+        render();
+      }
+
+      function submitRedoOrder() {
+        const costCenter = document.getElementById('redoCostCenterInput').value.trim();
+        state.redoCostCenter = costCenter;
+        state.pharmacyReauthDestination = 'pharmacyHome';
+        stepIndex = stepOrder.indexOf('redoSignOff');
+        render();
+      }
+
+      function submitRedoSignOff() {
+        state.loggedOutAfterRedo = true;
+        state.manualSignOuts += 1;
+        state.pharmacyReauthDestination = 'pharmacyHome';
+        if (state.pharmacyTimeout) {
+          clearTimeout(state.pharmacyTimeout);
+          state.pharmacyTimeout = null;
+        }
+        state.portalState.pharmacy = false;
+        stepIndex = stepOrder.indexOf('pharmacySignedOut');
+        render();
+      }
+
+      function submitEhrLogin() {
+        const email = document.getElementById('ehrEmail').value.trim();
+        const pass = document.getElementById('ehrPass').value;
+
+        const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const validPass = pass.length > 0 && pass !== state.procurementPass;
+        showError('ehrEmailError', !validEmail);
+        showError('ehrPassError', !validPass);
+        if (!validEmail || !validPass) {
+          if (!validEmail) recordErrorCode('Incorrect username.');
+          if (!validPass) recordErrorCode('Incorrect password.');
+          return;
+        }
+
+        state.ehrEmail = email;
+        state.ehrPass = pass;
+        state.loginAttempts.ehr += 1;
+        state.portalState.ehr = true;
+        state.activeTab = 'ehr';
+        stepIndex = stepOrder.indexOf('ehrChart');
+        render();
+      }
+
+      function submitPatientChart() {
+        const patient = document.getElementById('patientIdInput').value.trim();
+        const medication = document.getElementById('ehrMedicationSelect').value;
+        const quantity = Number(document.getElementById('ehrQuantityInput').value || 0);
+        const patientValid = patient.length > 0;
+        const medicationValid = medication.length > 0;
+        const quantityValid = Number.isInteger(quantity) && quantity >= 1 && quantity <= 5;
+
+        showError('patientIdError', !patientValid);
+        showError('ehrMedicationError', false);
+        showError('ehrQuantityError', !quantityValid);
+        if (!patientValid || !medicationValid || !quantityValid) return;
+
+        state.patientId = patient;
+        state.chartMedication = medication;
+        state.chartQuantity = quantity;
+        state.chartStatus = 'Medication added';
+        stepIndex = stepOrder.indexOf('ehrSignOff');
+        render();
+      }
+
+      function submitEhrSignOff() {
+        state.ehrSignedOut = true;
+        state.manualSignOuts += 1;
+        state.portalState.ehr = false;
+        stepIndex = stepOrder.indexOf('ehrSignedOut');
+        render();
+      }
+
+      function submitShippingLogin() {
+        const user = document.getElementById('shippingUser').value.trim();
+        const pass = document.getElementById('shippingPass').value;
+        const lockedOut = state.shippingPasswordFailed;
+        const validUser = validateUsername(user, '[a-z]+\\.[a-z]+') &&
+          (!lockedOut || !state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
+        const validPass = lockedOut
+          ? pass === '1234'
+          : pass.length > 0 && pass === (state.shippingRecoveryUsed ? state.shippingPass : state.procurementPass);
+        const passwordError = document.getElementById('shippingPassError');
+        passwordError.textContent = lockedOut
+          ? 'Your account has been locked. Contact your administrator or support team for assistance.'
+          : 'Incorrect password.';
+        showError('shippingUserError', !validUser);
+        showError('shippingPassError', !validPass);
+
+        if (!validUser || !validPass) {
+          if (!validUser) recordErrorCode('Incorrect username.');
+          if (validUser && !validPass) {
+            if (lockedOut) {
+              recordErrorCode('Your account has been locked. Contact your administrator or support team for assistance.');
+            } else {
+              recordErrorCode('Incorrect password.');
+              state.shippingPasswordFailed = true;
+              state.shippingUser = user;
+            }
+          }
+          return;
+        }
+
+        if (lockedOut) {
+          state.shippingRecoveryUsed = true;
+          state.shippingNeedsPasswordChange = true;
+          state.loginAttempts.shipping += 1;
+          stepIndex = stepOrder.indexOf('shippingPasswordChange');
+          render();
+          return;
+        }
+
+        state.shippingUser = user;
+        state.shippingPass = pass;
+        state.loginAttempts.shipping += 1;
+        state.portalState.shipping = true;
+        state.activeTab = 'shipping';
+        stepIndex = stepOrder.indexOf('shippingLookup');
+        render();
+      }
+
+      function completeShippingPasswordChange() {
+        const password = document.getElementById('shippingNewPassword').value;
+        const valid = password.length > 0;
+        showError('shippingNewPasswordError', !valid);
+        if (!valid) return;
+
+        state.shippingPasswordReset = password !== state.procurementPass;
+        state.shippingPass = password;
+        state.shippingPasswordFailed = false;
+        state.shippingNeedsPasswordChange = false;
+        state.portalState.shipping = false;
+        state.activeTab = 'shipping';
+        stepIndex = stepOrder.indexOf('shippingLogin');
+        render();
+      }
+
+      function submitShipmentLookup() {
+        const lookup = document.getElementById('shipmentLookupInput').value.trim();
+        const valid = lookup === state.orderId;
+        showError('shipmentLookupError', !valid);
+        if (!valid) return;
+
+        state.shippingLabel = `LBL-${Math.floor(1000000 + Math.random() * 9000000)}`;
+        state.trackingNumber = `TRK-${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+        stepIndex = stepOrder.indexOf('shipmentLocated');
+        render();
+      }
+
+      function restart() {
+        if (state.pharmacyTimeout) clearTimeout(state.pharmacyTimeout);
+        state.startTime = Date.now();
+        state.orderId = '';
+        state.medicationChoice = '';
+        state.redoMedicationChoice = '';
+        state.medicationQuantity = 0;
+        state.redoMedicationQuantity = 0;
+        state.redoCostCenter = '';
+        state.chartMedication = '';
+        state.chartQuantity = 0;
+        state.patientId = '';
+        state.chartStatus = '';
+        state.shippingLabel = '';
+        state.trackingNumber = '';
+        state.costCenter = '';
+        state.ehrPass = '';
+        state.ehrEmail = '';
+        state.shippingPasswordFailed = false;
+        state.shippingRecoveryUsed = false;
+        state.shippingNeedsPasswordChange = false;
+        state.shippingPasswordReset = false;
+        state.procurementUser = '';
+        state.procurementPass = '';
+        state.shippingUser = '';
+        state.shippingPass = '';
+        state.loggedOutAfterRedo = false;
+        state.ehrSignedOut = false;
+        state.pharmacySessionTimedOut = false;
+        state.pharmacyTimeout = null;
+        state.pharmacyTimeoutConsumed = false;
+        state.statusLookupOrderId = '';
+        state.statusLookupMedication = '';
+        state.statusLookupQuantity = 0;
+        state.statusLookupStatus = '';
+        state.statusLookupMatched = null;
+        state.loginAttempts = { pharmacy: 0, ehr: 0, shipping: 0 };
+        state.errorCodes = [];
+        state.signOutMisses = 0;
+        state.manualSignOuts = 0;
+        state.abandonedSignOuts = 0;
+        state.portalState = { pharmacy: false, ehr: false, shipping: false };
+        state.activeTab = 'pharmacy';
+        stepIndex = 0;
+        render();
+      }
+
+      document.querySelectorAll('.browser-tab').forEach((tabButton) => {
+        tabButton.addEventListener('click', () => switchPortalTab(tabButton.dataset.tab));
+      });
+
+      render();
+    </script>
+  </body>
 </html>
-
