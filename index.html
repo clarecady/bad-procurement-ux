@@ -31,43 +31,6 @@
         padding: 24px;
       }
 
-      .topbar {
-        max-width: 980px;
-        margin: 0 auto 18px;
-        background: var(--navy-2);
-        color: #eff6ff;
-        border-radius: 12px;
-        padding: 18px 22px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: var(--shadow);
-      }
-
-      .topbar strong {
-        display: block;
-        font-size: 11px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #a8c4de;
-      }
-
-      .topbar span {
-        font-size: 15px;
-        font-weight: 700;
-      }
-
-      .step-pill {
-        background: rgba(11, 108, 191, 0.2);
-        color: #e0f2fe;
-        padding: 8px 14px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-      }
-
       .shell {
         max-width: 980px;
         margin: 0 auto;
@@ -310,14 +273,6 @@
     </style>
   </head>
   <body>
-    <div class="topbar">
-      <div>
-        <strong>Pharmacy workflow</strong>
-        <span id="workflowLabel">Pharmacy workflow</span>
-      </div>
-      <div class="step-pill" id="stepBadge">Step 1 / 8</div>
-    </div>
-
     <div class="browser-tabs">
       <button type="button" class="browser-tab active" data-tab="pharmacy">Pharmacy portal</button>
       <button type="button" class="browser-tab" data-tab="ehr">EHR</button>
@@ -944,8 +899,6 @@
         statusActionButton.onclick = currentKey === 'shipmentLocated'
           ? () => goTo('summary')
           : restart;
-        document.getElementById('stepBadge').textContent = `Step ${stepIndex + 1} / ${stepOrder.length}`;
-        document.getElementById('workflowLabel').textContent = currentKey.includes('ehr') ? 'External chart workflow' : currentKey.includes('shipping') ? 'Shipment workflow' : 'Pharmacy workflow';
       }
 
       function showError(id, shouldShow) {
