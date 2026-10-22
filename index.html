@@ -317,6 +317,7 @@
         shippingUser: '',
         shippingPass: '',
         shipmentLookup: '',
+        shippingFailedAttempts: 0,
         shippingPasswordFailed: false,
         shippingRecoveryUsed: false,
         shippingNeedsPasswordChange: false,
@@ -422,7 +423,7 @@
           `
         },
         orderTask: {
-          title: 'Medication order',
+          title: 'Order Medication',
           tag: 'Pharmacy portal · order entry',
           render: () => `
             <div class="field">
@@ -493,7 +494,7 @@
         },
         portalExpired: {
           title: 'Session expired',
-          tag: 'Pharmacy portal · re-entry required',
+          tag: 'Pharmacy portal',
           render: () => `
             <div class="button-row">
               <button type="button" onclick="goTo('loginPortalAgain')">Sign in</button>
@@ -520,7 +521,7 @@
           `
         },
         redoOrderTask: {
-          title: 'Medication order',
+          title: 'Order Medication',
           tag: 'Pharmacy portal · order entry',
           render: () => `
             <div class="field">
@@ -584,7 +585,7 @@
         },
         ehrLogin: {
           title: 'ChartOne EHR',
-          tag: 'External EHR · signed out',
+          tag: 'External EHR',
           render: () => `
             <div class="field">
               <label for="ehrEmail">Username</label>
@@ -629,7 +630,7 @@
         },
         ehrSignOff: {
           title: 'Chart updated',
-          tag: 'External EHR · sign off',
+          tag: 'External EHR · sign out',
           render: () => `
             <p class="lead">Patient record update updated.</p>
             <div class="action-stack">
@@ -652,7 +653,12 @@
         shippingLogin: {
           title: 'ShipTrack',
           tag: 'Shipping portal · sign in',
-          render: () => `
+          render: () => state.shippingPasswordFailed
+            ? `
+            <p class="lead">Your account is locked after two unsuccessful sign-in attempts.</p>
+            <button type="button" onclick="startShippingPasswordRecovery()">Reset password</button>
+          `
+            : `
             <div class="field">
               <label for="shippingUser">Username</label>
               <input id="shippingUser" type="text" placeholder="name.name" />
@@ -821,6 +827,7 @@
 
       function getBackTarget(currentKey) {
         if (currentKey === 'orderTask' || currentKey === 'pharmacyStatusLookup') return 'pharmacyHome';
+        if (currentKey === 'shippingLookup') return null;
         const currentIndex = stepOrder.indexOf(currentKey);
         if (currentIndex === -1) return null;
 
@@ -1094,48 +1101,43 @@
       function submitShippingLogin() {
         const user = document.getElementById('shippingUser').value.trim();
         const pass = document.getElementById('shippingPass').value;
-        const lockedOut = state.shippingPasswordFailed;
         const validUser = validateUsername(user, '[a-z]+\\.[a-z]+') &&
-          (!lockedOut || !state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
-        const validPass = lockedOut
-          ? pass === '1234'
-          : pass.length > 0 && pass === (state.shippingRecoveryUsed ? state.shippingPass : state.procurementPass);
-        const passwordError = document.getElementById('shippingPassError');
-        passwordError.textContent = lockedOut
-          ? 'Your account has been locked. Contact your administrator or support team for assistance.'
-          : 'Incorrect password.';
+          (!state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
+        const passwordEntered = pass.length > 0;
         showError('shippingUserError', !validUser);
-        showError('shippingPassError', !validPass);
+        showError('shippingPassError', !passwordEntered || validUser);
 
-        if (!validUser || !validPass) {
+        if (!validUser || !passwordEntered) {
           if (!validUser) recordErrorCode('Incorrect username.');
-          if (validUser && !validPass) {
-            if (lockedOut) {
-              recordErrorCode('Your account has been locked. Contact your administrator or support team for assistance.');
-            } else {
-              recordErrorCode('Incorrect password.');
-              state.shippingPasswordFailed = true;
-              state.shippingUser = user;
-            }
-          }
           return;
         }
 
-        if (lockedOut) {
-          state.shippingRecoveryUsed = true;
-          state.shippingNeedsPasswordChange = true;
+        if (state.shippingRecoveryUsed && pass === state.shippingPass) {
           state.loginAttempts.shipping += 1;
-          stepIndex = stepOrder.indexOf('shippingPasswordChange');
+          state.portalState.shipping = true;
+          state.activeTab = 'shipping';
+          stepIndex = stepOrder.indexOf('shippingLookup');
           render();
           return;
         }
 
         state.shippingUser = user;
-        state.shippingPass = pass;
-        state.loginAttempts.shipping += 1;
-        state.portalState.shipping = true;
-        state.activeTab = 'shipping';
-        stepIndex = stepOrder.indexOf('shippingLookup');
+        state.shippingFailedAttempts += 1;
+        recordErrorCode('Incorrect password.');
+        if (state.shippingFailedAttempts >= 2) {
+          state.shippingPasswordFailed = true;
+          recordErrorCode('Shipping account locked after two unsuccessful sign-in attempts.');
+          render();
+          return;
+        }
+
+        showError('shippingPassError', true);
+      }
+
+      function startShippingPasswordRecovery() {
+        state.shippingRecoveryUsed = true;
+        state.shippingNeedsPasswordChange = true;
+        stepIndex = stepOrder.indexOf('shippingPasswordChange');
         render();
       }
 
@@ -1147,6 +1149,7 @@
 
         state.shippingPasswordReset = password !== state.procurementPass;
         state.shippingPass = password;
+        state.shippingFailedAttempts = 0;
         state.shippingPasswordFailed = false;
         state.shippingNeedsPasswordChange = false;
         state.portalState.shipping = false;
@@ -1185,6 +1188,7 @@
         state.costCenter = '';
         state.ehrPass = '';
         state.ehrEmail = '';
+        state.shippingFailedAttempts = 0;
         state.shippingPasswordFailed = false;
         state.shippingRecoveryUsed = false;
         state.shippingNeedsPasswordChange = false;
