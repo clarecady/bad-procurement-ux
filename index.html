@@ -578,6 +578,9 @@
         shippingFailedAttempts: 0,
         shippingPasswordFailed: false,
         shippingLockoutAcknowledged: false,
+        shippingNeedsPasswordChange: false,
+        shippingPasswordReset: false,
+        shippingPass: '',
         loggedOutAfterRedo: false,
         ehrSignedOut: false,
         pharmacySessionTimedOut: false,
@@ -928,6 +931,19 @@
             <button type="button" onclick="submitShippingLogin()">Sign in</button>
           `
         },
+        shippingPasswordChange: {
+          title: 'Reset shipping password',
+          tag: 'Shipping portal · password reset',
+          render: () => `
+            <p class="lead">Create a new password for your shipping account.</p>
+            <div class="field">
+              <label for="shippingNewPassword">New password</label>
+              <input id="shippingNewPassword" type="password" placeholder="Enter a new password" />
+              <div class="error" id="shippingNewPasswordError">Enter a new password that is different from 1234.</div>
+            </div>
+            <button type="button" onclick="completeShippingPasswordChange()">Save new password</button>
+          `
+        },
         shippingLookup: {
           title: 'Shipment status',
           tag: 'Shipping portal · tracking',
@@ -1021,6 +1037,7 @@
         'ehrSignOff',
         'ehrSignedOut',
         'shippingLogin',
+        'shippingPasswordChange',
         'shippingLookup',
         'shipmentLocated',
         'summary'
@@ -1108,7 +1125,9 @@
             ? (state.loggedOutAfterRedo || !state.orderId ? 'pharmacyHome' : 'redoSignOff')
             : (state.pharmacySessionTimedOut ? 'loginPortalAgain' : 'loginPortal'),
           ehr: state.portalState.ehr ? 'ehrChart' : 'ehrLogin',
-          shipping: state.portalState.shipping ? 'shippingLookup' : 'shippingLogin'
+          shipping: state.shippingNeedsPasswordChange
+            ? 'shippingPasswordChange'
+            : state.portalState.shipping ? 'shippingLookup' : 'shippingLogin'
         };
 
         const target = map[tab];
@@ -1358,25 +1377,28 @@
         const pass = document.getElementById('shippingPass').value;
         const validUser = user.toLowerCase() === PHARMACY_USERNAME &&
           (!state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
-        const validPassword = state.shippingPasswordFailed && state.shippingLockoutAcknowledged
+        const recoverySignIn = state.shippingPasswordFailed && state.shippingLockoutAcknowledged;
+        const validPassword = recoverySignIn
           ? pass === '1234'
-          : pass.length > 0;
+          : state.shippingPasswordReset ? pass === state.shippingPass : pass.length > 0;
         showError('shippingUserError', !validUser);
-        showError('shippingPassError', !validPassword || validUser);
+        showError('shippingPassError', !validPassword);
 
         if (!validUser || !validPassword) {
           if (!validUser) recordErrorCode('Incorrect username.');
-          if (state.shippingPasswordFailed && state.shippingLockoutAcknowledged && validUser && !validPassword) {
-            state.shippingLockoutAcknowledged = false;
-            render();
-            return;
-          }
+          if (!validPassword) recordErrorCode('Incorrect password.');
           return;
         }
 
-        if (state.shippingPasswordFailed && state.shippingLockoutAcknowledged) {
-          state.shippingPasswordFailed = false;
+        if (recoverySignIn) {
+          state.shippingNeedsPasswordChange = true;
           state.shippingLockoutAcknowledged = false;
+          stepIndex = stepOrder.indexOf('shippingPasswordChange');
+          render();
+          return;
+        }
+
+        if (state.shippingPasswordReset) {
           state.loginAttempts.shipping += 1;
           state.portalState.shipping = true;
           state.activeTab = 'shipping';
@@ -1400,6 +1422,24 @@
 
       function acknowledgeShippingLockout() {
         state.shippingLockoutAcknowledged = true;
+        render();
+      }
+
+      function completeShippingPasswordChange() {
+        const password = document.getElementById('shippingNewPassword').value;
+        const valid = password.length > 0 && password !== '1234';
+        showError('shippingNewPasswordError', !valid);
+        if (!valid) return;
+
+        state.shippingPass = password;
+        state.shippingNeedsPasswordChange = false;
+        state.shippingPasswordReset = true;
+        state.shippingPasswordFailed = false;
+        state.shippingLockoutAcknowledged = false;
+        state.shippingFailedAttempts = 0;
+        state.portalState.shipping = false;
+        state.activeTab = 'shipping';
+        stepIndex = stepOrder.indexOf('shippingLogin');
         render();
       }
 
@@ -1437,6 +1477,9 @@
         state.shippingFailedAttempts = 0;
         state.shippingPasswordFailed = false;
         state.shippingLockoutAcknowledged = false;
+        state.shippingNeedsPasswordChange = false;
+        state.shippingPasswordReset = false;
+        state.shippingPass = '';
         state.procurementUser = '';
         state.procurementPass = '';
         state.shippingUser = '';
