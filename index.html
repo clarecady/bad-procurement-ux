@@ -1354,22 +1354,34 @@
       }
 
       function submitShippingLogin() {
-        if (state.shippingPasswordFailed) {
-          state.shippingLockoutAcknowledged = false;
-          render();
-          return;
-        }
-
         const user = document.getElementById('shippingUser').value.trim();
         const pass = document.getElementById('shippingPass').value;
         const validUser = user.toLowerCase() === PHARMACY_USERNAME &&
           (!state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
-        const passwordEntered = pass.length > 0;
+        const validPassword = state.shippingPasswordFailed && state.shippingLockoutAcknowledged
+          ? pass === '1234'
+          : pass.length > 0;
         showError('shippingUserError', !validUser);
-        showError('shippingPassError', !passwordEntered || validUser);
+        showError('shippingPassError', !validPassword || validUser);
 
-        if (!validUser || !passwordEntered) {
+        if (!validUser || !validPassword) {
           if (!validUser) recordErrorCode('Incorrect username.');
+          if (state.shippingPasswordFailed && state.shippingLockoutAcknowledged && validUser && !validPassword) {
+            state.shippingLockoutAcknowledged = false;
+            render();
+            return;
+          }
+          return;
+        }
+
+        if (state.shippingPasswordFailed && state.shippingLockoutAcknowledged) {
+          state.shippingPasswordFailed = false;
+          state.shippingLockoutAcknowledged = false;
+          state.loginAttempts.shipping += 1;
+          state.portalState.shipping = true;
+          state.activeTab = 'shipping';
+          stepIndex = stepOrder.indexOf('shippingLookup');
+          render();
           return;
         }
 
