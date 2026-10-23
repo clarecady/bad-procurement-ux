@@ -31,6 +31,106 @@
         padding: 24px;
       }
 
+      .browser-window {
+        max-width: 980px;
+        margin: 0 auto 18px;
+        overflow: hidden;
+        border: 1px solid #cbd2da;
+        border-radius: 10px;
+        background: #e8ebef;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+      }
+
+      .browser-chrome {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 14px;
+        background: #e8ebef;
+        border-bottom: 1px solid #d3d8de;
+      }
+
+      .window-controls {
+        display: flex;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .window-controls span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #9aa1a9;
+      }
+
+      .window-controls span:first-child { background: #bd2638; }
+      .window-controls span:nth-child(2) { background: #a7aab0; }
+      .window-controls span:nth-child(3) { background: #777e87; }
+
+      .browser-actions {
+        display: flex;
+        gap: 12px;
+        color: #454b53;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .address-bar {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        padding: 8px 14px;
+        border: 1px solid #d0d5db;
+        border-radius: 999px;
+        background: #fff;
+        color: #222;
+        font-size: 12px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .browser-tabs {
+        max-width: 980px;
+        margin: 0 auto 18px;
+        display: flex;
+        gap: 8px;
+        background: #eaeef3;
+        border: 1px solid var(--line);
+        border-radius: 12px 12px 0 0;
+        padding: 10px 12px 0;
+      }
+
+      .browser-window .browser-tabs {
+        max-width: none;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .browser-tab {
+        border: 1px solid transparent;
+        border-bottom: none;
+        background: #dfe3e8;
+        color: #252a30;
+        border-radius: 8px 8px 0 0;
+        padding: 10px 16px;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        min-width: 160px;
+      }
+
+      .browser-tab[data-tab="pharmacy"] { color: #b42318; }
+      .browser-tab[data-tab="ehr"] { color: var(--navy); }
+      .browser-tab[data-tab="shipping"] { color: #741622; }
+
+      .browser-tab.active {
+        background: #fff;
+        border-color: #cbd2da;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.06);
+      }
+
       .shell {
         max-width: 980px;
         margin: 0 auto;
@@ -120,36 +220,6 @@
         align-items: center;
         gap: 12px;
         margin-top: 8px;
-      }
-
-      .browser-tabs {
-        max-width: 980px;
-        margin: 0 auto 18px;
-        display: flex;
-        gap: 8px;
-        background: #eaeef3;
-        border: 1px solid var(--line);
-        border-radius: 12px 12px 0 0;
-        padding: 10px 12px 0;
-      }
-
-      .browser-tab {
-        border: 1px solid transparent;
-        border-bottom: none;
-        background: #edf2f7;
-        color: var(--navy);
-        border-radius: 10px 10px 0 0;
-        padding: 10px 16px;
-        font-size: 12px;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        min-width: 160px;
-      }
-
-      .browser-tab.active {
-        background: var(--panel);
-        border-color: var(--line);
-        box-shadow: 0 -4px 12px rgba(18, 61, 102, 0.04);
       }
 
       button {
@@ -270,13 +340,198 @@
         display: flex;
         justify-content: flex-end;
       }
+
+      body.portal-pharmacy {
+        --bg: #f0f0f0;
+        --panel: #fff;
+        --panel-alt: #f5f5f5;
+        --line: #d1d1d1;
+        --blue: #b42318;
+        --navy: #202020;
+        --slate: #111;
+        --slate-2: #111;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: #f0f0f0;
+        color: #111;
+      }
+
+      body.portal-pharmacy .shell {
+        border-radius: 3px;
+        border-top: 5px solid #b42318;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      body.portal-pharmacy .panel-header {
+        align-items: center;
+        padding: 18px 28px 16px;
+        background: #fff;
+        border-bottom: 2px solid #222;
+      }
+
+      body.portal-pharmacy .panel-header h2 {
+        color: #111;
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      body.portal-pharmacy .content {
+        background: #fff;
+      }
+
+      body.portal-pharmacy .lead,
+      body.portal-pharmacy label,
+      body.portal-pharmacy .system-tag,
+      body.portal-pharmacy .field-hint,
+      body.portal-pharmacy .token,
+      body.portal-pharmacy .note,
+      body.portal-pharmacy .success {
+        color: #111;
+      }
+
+      body.portal-pharmacy .token,
+      body.portal-pharmacy .note {
+        background: #f4f4f4;
+        border: 1px solid #c7c7c7;
+        border-radius: 3px;
+      }
+
+      body.portal-pharmacy input,
+      body.portal-pharmacy select {
+        border-color: #777;
+        border-radius: 3px;
+        color: #111;
+      }
+
+      body.portal-pharmacy input::placeholder,
+      body.portal-shipping input::placeholder {
+        color: #111;
+        opacity: 1;
+      }
+
+      body.portal-pharmacy input:focus,
+      body.portal-pharmacy select:focus {
+        outline-color: rgba(180, 35, 24, 0.22);
+        border-color: #b42318;
+      }
+
+      body.portal-pharmacy #screenContent button:not(.ghost-button):not(.restart-button) {
+        background: #b42318;
+        border-radius: 3px;
+      }
+
+      body.portal-pharmacy .ghost-button,
+      body.portal-pharmacy .restart-button,
+      body.portal-pharmacy .portal-back button {
+        color: #111;
+        border-radius: 3px;
+      }
+
+      body.portal-shipping {
+        --bg: #e9e9e9;
+        --panel: #fff;
+        --panel-alt: #f3f3f3;
+        --line: #d1d1d1;
+        --blue: #a51f2d;
+        --navy: #252525;
+        --slate: #111;
+        --slate-2: #111;
+        --shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+        background: #e9e9e9;
+        color: #111;
+      }
+
+      body.portal-shipping .shell {
+        border-radius: 14px;
+        border-color: #c9c9c9;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+      }
+
+      body.portal-shipping .panel-header {
+        align-items: center;
+        min-height: 94px;
+        padding: 20px 30px;
+        background: #ededed;
+        border-bottom: 1px solid #d2d2d2;
+        border-left: 8px solid #a51f2d;
+      }
+
+      body.portal-shipping .panel-header h2 {
+        color: #111;
+        font-size: 24px;
+        letter-spacing: 0.02em;
+      }
+
+      body.portal-shipping .content {
+        padding: 30px;
+        background: #fff;
+      }
+
+      body.portal-shipping .lead,
+      body.portal-shipping label,
+      body.portal-shipping .system-tag,
+      body.portal-shipping .field-hint,
+      body.portal-shipping .token,
+      body.portal-shipping .note,
+      body.portal-shipping .success {
+        color: #111;
+      }
+
+      body.portal-shipping .token,
+      body.portal-shipping .note {
+        background: #f2f2f2;
+        border: 1px solid #d0d0d0;
+        border-radius: 10px;
+      }
+
+      body.portal-shipping input,
+      body.portal-shipping select {
+        border-color: #aaa;
+        border-radius: 10px;
+        color: #111;
+      }
+
+      body.portal-shipping input:focus,
+      body.portal-shipping select:focus {
+        outline-color: rgba(165, 31, 45, 0.2);
+        border-color: #a51f2d;
+      }
+
+      body.portal-shipping #screenContent button:not(.ghost-button):not(.restart-button) {
+        background: #a51f2d;
+        border-radius: 10px;
+      }
+
+      body.portal-shipping .ghost-button,
+      body.portal-shipping .restart-button,
+      body.portal-shipping .portal-back button {
+        color: #111;
+        border-radius: 10px;
+      }
+
+      @media (max-width: 640px) {
+        body { padding: 12px; }
+        .browser-chrome { gap: 9px; padding: 8px 10px; }
+        .browser-actions { gap: 8px; }
+        .browser-tabs { gap: 4px; padding: 8px 6px 0; }
+        .browser-tab { min-width: 0; flex: 1; padding: 10px 6px; font-size: 10px; }
+        .panel-header, body.portal-pharmacy .panel-header,
+        body.portal-shipping .panel-header { padding: 18px; }
+        .content, body.portal-shipping .content { padding: 18px; }
+      }
     </style>
   </head>
   <body>
-    <div class="browser-tabs">
-      <button type="button" class="browser-tab active" data-tab="pharmacy">Pharmacy portal</button>
-      <button type="button" class="browser-tab" data-tab="ehr">EHR</button>
-      <button type="button" class="browser-tab" data-tab="shipping">Shipping portal</button>
+    <div class="browser-window">
+      <div class="browser-chrome" aria-label="Browser toolbar">
+        <div class="window-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="browser-actions" aria-hidden="true"><span>‹</span><span>›</span><span>↻</span></div>
+        <div class="address-bar" id="addressBar">secure.rxflow.example/sign-in</div>
+      </div>
+      <div class="browser-tabs">
+        <button type="button" class="browser-tab active" data-tab="pharmacy">Pharmacy portal</button>
+        <button type="button" class="browser-tab" data-tab="ehr">EHR</button>
+        <button type="button" class="browser-tab" data-tab="shipping">Shipping portal</button>
+      </div>
     </div>
 
     <div class="shell">
@@ -295,6 +550,9 @@
     </div>
 
     <script>
+      const PHARMACY_USERNAME = 'steve.nicks';
+      const EHR_USERNAME = 'steve.nicks@fwmac.com';
+
       const state = {
         orderId: '',
         ndc: 'NDC-00703-9121-01',
@@ -314,14 +572,12 @@
         procurementPass: '',
         ehrEmail: '',
         ehrPass: '',
+        ehrVaultAutofillPending: true,
         shippingUser: '',
-        shippingPass: '',
         shipmentLookup: '',
         shippingFailedAttempts: 0,
         shippingPasswordFailed: false,
-        shippingRecoveryUsed: false,
-        shippingNeedsPasswordChange: false,
-        shippingPasswordReset: false,
+        shippingLockoutAcknowledged: false,
         loggedOutAfterRedo: false,
         ehrSignedOut: false,
         pharmacySessionTimedOut: false,
@@ -589,13 +845,13 @@
           render: () => `
             <div class="field">
               <label for="ehrEmail">Username</label>
-              <input id="ehrEmail" type="email" placeholder="name.name@example.com" />
-              <div class="error" id="ehrEmailError">Incorrect username.</div>
+              <input id="ehrEmail" type="email" placeholder="name.name@example.com" value="${state.ehrVaultAutofillPending ? EHR_USERNAME : ''}" />
+              <div class="error" id="ehrEmailError">Enter your username.</div>
             </div>
             <div class="field">
               <label for="ehrPass">Password</label>
-              <input id="ehrPass" type="password" placeholder="Enter your password" />
-              <div class="error" id="ehrPassError">Incorrect password.</div>
+              <input id="ehrPass" type="password" placeholder="Enter your password" value="${state.ehrVaultAutofillPending ? 'VaultPassword123!' : ''}" />
+              <div class="error" id="ehrPassError">Enter your password.</div>
             </div>
             <button type="button" onclick="submitEhrLogin()">Sign in</button>
           `
@@ -653,10 +909,10 @@
         shippingLogin: {
           title: 'ShipTrack',
           tag: 'Shipping portal · sign in',
-          render: () => state.shippingPasswordFailed
+          render: () => state.shippingPasswordFailed && !state.shippingLockoutAcknowledged
             ? `
-            <p class="lead">Your account is locked after two unsuccessful sign-in attempts.</p>
-            <button type="button" onclick="startShippingPasswordRecovery()">Reset password</button>
+            <p class="lead">Unable to sign you in, please contact your system administrator.</p>
+            <button type="button" onclick="acknowledgeShippingLockout()">OK</button>
           `
             : `
             <div class="field">
@@ -670,19 +926,6 @@
               <div class="error" id="shippingPassError">Incorrect password.</div>
             </div>
             <button type="button" onclick="submitShippingLogin()">Sign in</button>
-          `
-        },
-        shippingPasswordChange: {
-          title: 'Review shipping password',
-          tag: 'Shipping portal · password change',
-          render: () => `
-            <p class="lead">Choose a new password for your shipping account. You will use it to sign in after changing it.</p>
-            <div class="field">
-              <label for="shippingNewPassword">New password</label>
-              <input id="shippingNewPassword" type="password" />
-              <div class="error" id="shippingNewPasswordError">Enter a password to continue.</div>
-            </div>
-            <button type="button" onclick="completeShippingPasswordChange()">Save new password</button>
           `
         },
         shippingLookup: {
@@ -751,8 +994,6 @@
                 Shipping ID: ${state.shippingLabel}<br />
                 Tracking number: ${state.trackingNumber}<br />
                 Patient: ${escapeHtml(state.patientId)}<br />
-                Shipping account recovery used: ${state.shippingRecoveryUsed ? 'Yes' : 'No'}<br />
-                Shipping password reset: ${state.shippingPasswordReset ? 'Yes' : 'No'}<br />
                 Pharmacy portal manually signed out: ${pharmacySignout}<br />
                 EHR manually signed out: ${ehrSignout}<br />
                 Completion time: ${elapsedSeconds} seconds<br />
@@ -780,7 +1021,6 @@
         'ehrSignOff',
         'ehrSignedOut',
         'shippingLogin',
-        'shippingPasswordChange',
         'shippingLookup',
         'shipmentLocated',
         'summary'
@@ -868,10 +1108,7 @@
             ? (state.loggedOutAfterRedo || !state.orderId ? 'pharmacyHome' : 'redoSignOff')
             : (state.pharmacySessionTimedOut ? 'loginPortalAgain' : 'loginPortal'),
           ehr: state.portalState.ehr ? 'ehrChart' : 'ehrLogin',
-          shipping: state.shippingNeedsPasswordChange
-            ? 'shippingPasswordChange'
-            : state.portalState.shipping ? 'shippingLookup'
-                : 'shippingLogin'
+          shipping: state.portalState.shipping ? 'shippingLookup' : 'shippingLogin'
         };
 
         const target = map[tab];
@@ -893,6 +1130,15 @@
         else if (currentKey.includes('ehr')) state.activeTab = 'ehr';
         else if (currentKey.includes('shipping')) state.activeTab = 'shipping';
         else state.activeTab = 'pharmacy';
+
+        document.body.classList.toggle('portal-pharmacy', state.activeTab === 'pharmacy');
+        document.body.classList.toggle('portal-shipping', state.activeTab === 'shipping');
+        const portalAddresses = {
+          pharmacy: 'rxflow.example · secure session',
+          ehr: 'chartone.example · secure session',
+          shipping: 'shiptrack.example · secure session'
+        };
+        document.getElementById('addressBar').textContent = portalAddresses[state.activeTab];
 
         document.querySelectorAll('.browser-tab').forEach((tabButton) => {
           tabButton.classList.toggle('active', tabButton.dataset.tab === state.activeTab);
@@ -917,7 +1163,7 @@
       function submitProcurementLogin() {
         const username = document.getElementById('procurementUser').value.trim();
         const password = document.getElementById('procurementPass').value;
-        const usernameValid = validateUsername(username, '[a-z]+\\.[a-z]+');
+        const usernameValid = username.toLowerCase() === PHARMACY_USERNAME;
         const passwordValid = password.length > 0;
 
         showError('procurementUserError', !usernameValid);
@@ -984,7 +1230,7 @@
         const username = document.getElementById('procurementUserAgain').value.trim();
         const password = document.getElementById('procurementPassAgain').value;
 
-        const validUser = validateUsername(username, state.procurementUser || '[a-z]+\\.[a-z]+');
+        const validUser = username.toLowerCase() === PHARMACY_USERNAME;
         const validPass = password === state.procurementPass;
         showError('procurementUserAgainError', !validUser);
         showError('procurementPassAgainError', !validPass);
@@ -1047,10 +1293,19 @@
       }
 
       function submitEhrLogin() {
+        if (state.ehrVaultAutofillPending) {
+          state.ehrVaultAutofillPending = false;
+          document.getElementById('ehrEmail').value = '';
+          document.getElementById('ehrPass').value = '';
+          showError('ehrEmailError', true);
+          showError('ehrPassError', true);
+          return;
+        }
+
         const email = document.getElementById('ehrEmail').value.trim();
         const pass = document.getElementById('ehrPass').value;
 
-        const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const validEmail = email.toLowerCase() === EHR_USERNAME;
         const validPass = pass.length > 0 && pass !== state.procurementPass;
         showError('ehrEmailError', !validEmail);
         showError('ehrPassError', !validPass);
@@ -1099,9 +1354,15 @@
       }
 
       function submitShippingLogin() {
+        if (state.shippingPasswordFailed) {
+          state.shippingLockoutAcknowledged = false;
+          render();
+          return;
+        }
+
         const user = document.getElementById('shippingUser').value.trim();
         const pass = document.getElementById('shippingPass').value;
-        const validUser = validateUsername(user, '[a-z]+\\.[a-z]+') &&
+        const validUser = user.toLowerCase() === PHARMACY_USERNAME &&
           (!state.shippingUser || user.toLowerCase() === state.shippingUser.toLowerCase());
         const passwordEntered = pass.length > 0;
         showError('shippingUserError', !validUser);
@@ -1109,15 +1370,6 @@
 
         if (!validUser || !passwordEntered) {
           if (!validUser) recordErrorCode('Incorrect username.');
-          return;
-        }
-
-        if (state.shippingRecoveryUsed && pass === state.shippingPass) {
-          state.loginAttempts.shipping += 1;
-          state.portalState.shipping = true;
-          state.activeTab = 'shipping';
-          stepIndex = stepOrder.indexOf('shippingLookup');
-          render();
           return;
         }
 
@@ -1134,27 +1386,8 @@
         showError('shippingPassError', true);
       }
 
-      function startShippingPasswordRecovery() {
-        state.shippingRecoveryUsed = true;
-        state.shippingNeedsPasswordChange = true;
-        stepIndex = stepOrder.indexOf('shippingPasswordChange');
-        render();
-      }
-
-      function completeShippingPasswordChange() {
-        const password = document.getElementById('shippingNewPassword').value;
-        const valid = password.length > 0;
-        showError('shippingNewPasswordError', !valid);
-        if (!valid) return;
-
-        state.shippingPasswordReset = password !== state.procurementPass;
-        state.shippingPass = password;
-        state.shippingFailedAttempts = 0;
-        state.shippingPasswordFailed = false;
-        state.shippingNeedsPasswordChange = false;
-        state.portalState.shipping = false;
-        state.activeTab = 'shipping';
-        stepIndex = stepOrder.indexOf('shippingLogin');
+      function acknowledgeShippingLockout() {
+        state.shippingLockoutAcknowledged = true;
         render();
       }
 
@@ -1188,15 +1421,13 @@
         state.costCenter = '';
         state.ehrPass = '';
         state.ehrEmail = '';
+        state.ehrVaultAutofillPending = true;
         state.shippingFailedAttempts = 0;
         state.shippingPasswordFailed = false;
-        state.shippingRecoveryUsed = false;
-        state.shippingNeedsPasswordChange = false;
-        state.shippingPasswordReset = false;
+        state.shippingLockoutAcknowledged = false;
         state.procurementUser = '';
         state.procurementPass = '';
         state.shippingUser = '';
-        state.shippingPass = '';
         state.loggedOutAfterRedo = false;
         state.ehrSignedOut = false;
         state.pharmacySessionTimedOut = false;
